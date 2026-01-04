@@ -19,8 +19,8 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll() // For H2 console if used
                         .requestMatchers("/users/**").permitAll() // Allow access to user endpoints
                         .requestMatchers("/hello").permitAll() // Allow access to hello endpoint
-                        .anyRequest().authenticated()
-                );
+                        .requestMatchers("/api/lab10/**").permitAll() // Allow access to Lab 10 endpoints
+                        .anyRequest().authenticated());
         return http.build();
     }
 }

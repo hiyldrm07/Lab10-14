@@ -48,6 +48,18 @@ class UserServiceTest {
     }
 
     @Test
+    void createUser_WhenRepositoryThrowsException_ShouldPropagateException() {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword("rawPassword");
+
+        when(passwordEncoder.encode("rawPassword")).thenReturn("hashedPassword");
+        when(userRepository.save(any(User.class))).thenThrow(new RuntimeException("Database error"));
+
+        assertThrows(RuntimeException.class, () -> userService.createUser(user));
+    }
+
+    @Test
     void authenticate_WithCorrectCredentials_ShouldReturnUser() {
         User user = new User();
         user.setUsername("testuser");
@@ -72,6 +84,15 @@ class UserServiceTest {
         when(passwordEncoder.matches("wrongPassword", "hashedPassword")).thenReturn(false);
 
         User authenticatedUser = userService.authenticate("testuser", "wrongPassword");
+
+        assertNull(authenticatedUser);
+    }
+
+    @Test
+    void authenticate_WithNonExistentUser_ShouldReturnNull() {
+        when(userRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
+
+        User authenticatedUser = userService.authenticate("nonexistent", "password");
 
         assertNull(authenticatedUser);
     }

@@ -26,6 +26,7 @@ public class NoteController {
         List<Note> notes = noteService.getNotesByUser(user);
         model.addAttribute("notes", notes);
         model.addAttribute("username", user.getUsername());
+        model.addAttribute("role", user.getRole().name());
         return "notes";
     }
 

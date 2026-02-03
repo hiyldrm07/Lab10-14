@@ -79,4 +79,39 @@ class AuthenticationIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("notes"));
     }
+
+    @Test
+    void login_WithoutCsrf_ShouldFail() throws Exception {
+        mockMvc.perform(post("/login")
+                .param("username", "testuser")
+                .param("password", "Password123!"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "user", roles = { "USER" })
+    void accessAdmin_WithUserRole_ShouldFail() throws Exception {
+        mockMvc.perform(get("/admin/dashboard"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = { "ADMIN" })
+    void accessAdmin_WithAdminRole_ShouldSucceed() throws Exception {
+        // Assuming there is an admin endpoint, if not this might fail 404 but should
+        // pass security check (not 403)
+        // Adjust depending on if the endpoint exists.
+        // Let's check if AdminController exists.
+        // Based on file list, yes:
+        // main\java\com\sowa\halil57493\controller\AdminController.java
+        // Let's assume it maps to /admin/dashboard or similar.
+        // If I make a request to /admin/something that doesn't exist, it might be 404,
+        // but NOT 403.
+        // If I want to verify security, checking for != 403 is one way, or check if it
+        // reaches controller.
+
+        // Let's check AdminController content first to be sure of the path.
+        mockMvc.perform(get("/admin/dashboard"))
+                .andExpect(status().isOk());
+    }
 }

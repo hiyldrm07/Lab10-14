@@ -20,9 +20,13 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>Welcome, <span th:text="${username}">User</span>!</h1>
-            <form th:action="@{/logout}" method="post">
-                <button type="submit" class="btn btn-outline-danger">Logout</button>
-            </form>
+            <div>
+                <a th:if="${role == 'ADMIN'}" th:href="@{/admin/dashboard}" class="btn btn-warning me-2">Admin
+                    Dashboard</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline-danger">Logout</button>
+                </form>
+            </div>
         </div>
 
         <div class="row">

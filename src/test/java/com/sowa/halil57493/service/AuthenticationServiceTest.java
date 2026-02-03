@@ -1,10 +1,12 @@
 package com.sowa.halil57493.service;
 
 import com.sowa.halil57493.controller.auth.RegisterRequest;
+import com.sowa.halil57493.model.Role;
 import com.sowa.halil57493.model.User;
 import com.sowa.halil57493.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -39,15 +41,24 @@ class AuthenticationServiceTest {
         User savedUser = new User();
         savedUser.setId(1L);
         savedUser.setUsername("testuser");
+        savedUser.setRole(Role.USER);
 
         when(passwordEncoder.encode(any())).thenReturn("hashed");
-        when(userRepository.save(any())).thenReturn(savedUser);
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         User result = authenticationService.register(request);
 
         assertNotNull(result);
         assertEquals("testuser", result.getUsername());
-        verify(userRepository).save(any());
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userCaptor.capture());
         verify(passwordEncoder).encode("Password123!");
+
+        User capturedUser = userCaptor.getValue();
+        assertEquals("testuser", capturedUser.getUsername());
+        assertEquals("test@example.com", capturedUser.getEmail());
+        assertEquals("hashed", capturedUser.getPassword());
+        assertEquals(Role.USER, capturedUser.getRole());
     }
 }
